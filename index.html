@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title></title>
+    <style media="screen">
+      canvas {
+        border: 1px solid navy;
+        padding: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="canvas" width="640" height="640"></canvas>
+    <p id="iteration"></p>
+    <p id="fps">No FPS calculated yet</p>
+    <script id="vertex-shader" type="x-shader/x-vertex">
+      attribute vec2 position;
+
+      void main(void) {
+        gl_Position = vec4(position, 0, 1);
+      }
+    </script>
+
+    <script id="fragment-shader" type="x-shader/x-fragment">
+      precision mediump float;
+      #define WIDTH 640.0
+      #define HEIGHT 640.0
+      #define ZOOM_FACTOR 0.33
+
+      uniform float maxSteps;
+
+      void  main(void) {
+        vec2 z, startPosition;
+        vec2 offset = vec2(-0.5,-0.0);
+        startPosition.x = (gl_FragCoord.x - WIDTH/2.0) / WIDTH / ZOOM_FACTOR + offset.x;
+        startPosition.y = (gl_FragCoord.y - HEIGHT/2.0) / HEIGHT/ ZOOM_FACTOR + offset.y;
+        z = vec2(startPosition);
+
+        float steps;
+        float x,y;
+        for (float i=0.0; i>-1.0; i++) {
+          steps = i;
+          x = (z.x * z.x - z.y * z.y) + startPosition.x;
+          y = (2.0 * z.x * z.y) + startPosition.y;
+
+          if (i > maxSteps) {
+            break;
+          }
+          if ((x*x+y*y) > 4.0) {
+            break;
+          }
+          z.x = x;
+          z.y = y;
+        }
+
+        gl_FragColor = vec4(steps/maxSteps, 0, 0, 1);
+      }
+    </script>
+
+    <script src="fps.js" charset="utf-8"></script>
+    <script src="app.js" charset="utf-8"></script>
+  </body>
+</html>
